@@ -9,13 +9,14 @@ public class Player extends Thread {
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
 
-    public Player(Socket socket, int batches) {
+    public Player(Socket socket, int batchSize) {
         this.next = null;
+        this.batches = 0;
         try {
             this.socket = socket;
             this.inputStream = new DataInputStream(socket.getInputStream());
             this.outputStream = new DataOutputStream(socket.getOutputStream());
-            outputStream.writeInt(batches);
+            outputStream.writeInt(batchSize);
         } catch (Exception e) {
             this.socket = null;
             this.inputStream = null;
@@ -32,21 +33,27 @@ public class Player extends Thread {
         this.batches = batches;
     }
 
+    public void addBatch() {
+        this.batches++;
+    }
+
     @Override
     public void run() {
         while (true) {
             try {
                 if (batches != 0) {
-                    System.out.println("sending batches to client");
+                    System.out.printf("Sending batches to client %d%n", batches);
                     outputStream.writeInt(batches);
+                    batches = 0;
                 }
 
                 final int batchComplete = inputStream.readInt();
-                // TODO send 2 next player if they exist
-//                final UUID nextPlayer = player.getNextPlayer();
-//                if (nextPlayer == null) {
-//                    return;
-//                }
+                System.out.println("Player received message from client");
+                if (next == null) {
+                    return;
+                }
+                System.out.println("Sending batch to the next player");
+                next.addBatch();
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -29,6 +29,7 @@ public class Client extends Application {
     private int batchSize;
     // How many coins the user has flipped in their current batch
     private int count = 0;
+    private boolean readyForNextBatch = true;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -49,21 +50,6 @@ public class Client extends Application {
         pennyGrid.setVgap(10);
 
         hBoxTop.getChildren().add(pennyGrid);
-
-        final Button button = new Button("Pass Pennies");
-        button.setOnAction(event -> {
-            if (count != batchSize) {
-                return;
-            }
-            try {
-                outputStream.writeInt(6000);
-                count = 0;
-                pennyGrid.getChildren().forEach(child -> ((Circle) child).setFill(Color.BLACK));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        hBoxTop.getChildren().add(button);
 
         // TODO bottom half of the UI (clean this up maybe)
         final GridPane scoreGrid = new GridPane();
@@ -103,50 +89,78 @@ public class Client extends Application {
         final ReadThread readThread = new ReadThread(socket, inputStream);
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1), action -> {
+        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(0.5), action -> {
             final int batches = readThread.getBatches();
-            if (count != 0 || batches == 0) {
-                return;
+            System.out.printf("count: %d, batches: %d%n", count, batches);
+            if (readyForNextBatch && batches != 0) {
+                System.out.println("Refreshing board");
+                readThread.setBatches(batches - 1);
+                initPennies(pennyGrid);
             }
-
-            readThread.setBatches(batches - 1);
-            initPennies(pennyGrid);
         }));
         readThread.start();
         timeline.play();
+
+        final Button button = new Button("Pass Pennies");
+        button.setOnAction(event -> {
+            if (count != batchSize) {
+                return;
+            }
+            try {
+                outputStream.writeInt(6000);
+                count = 0;
+                readyForNextBatch = true;
+                fillAll(pennyGrid, readThread.getBatches() == 0 ? Color.WHITE : Color.BLACK);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        hBoxTop.getChildren().add(button);
 
         stage.setScene(new Scene(vbox));
         stage.show();
     }
 
     public void initPennies(GridPane pennyGrid) {
-        int pennyCount = 0;
-        for (int n = 0; n < ROWS; n++) {
-            for (int m = 0; m < COLUMNS; m++) {
-                if (pennyCount > batchSize) {
-                    return;
-                }
-                final Circle circle = new Circle(30, Color.BLACK);
-                circle.setOnMouseClicked(event -> {
-                    if (circle.getFill() == Color.GRAY) {
+        readyForNextBatch = false;
+
+        if (pennyGrid.getChildren().isEmpty()) {
+            int pennyCount = 0;
+            for (int n = 0; n < ROWS; n++) {
+                for (int m = 0; m < COLUMNS; m++) {
+                    if (pennyCount >= batchSize) {
                         return;
                     }
-                    ScaleTransition stHideFront = new ScaleTransition(Duration.millis(500), circle);
-                    stHideFront.setFromX(1);
-                    stHideFront.setToX(0);
-                    ScaleTransition stShowBack = new ScaleTransition(Duration.millis(500), circle);
-                    stShowBack.setFromX(0);
-                    stShowBack.setToX(1);
-                    stHideFront.setOnFinished(t -> {
-                        circle.setFill(Color.GRAY);
-                        stShowBack.play();
+                    final Circle circle = new Circle(30, Color.BLACK);
+                    circle.setOnMouseClicked(event -> {
+                        if (circle.getFill() == Color.GRAY) {
+                            return;
+                        }
+                        ScaleTransition stHideFront = new ScaleTransition(Duration.millis(250), circle);
+                        stHideFront.setFromX(1);
+                        stHideFront.setToX(0);
+                        ScaleTransition stShowBack = new ScaleTransition(Duration.millis(250), circle);
+                        stShowBack.setFromX(0);
+                        stShowBack.setToX(1);
+                        stHideFront.setOnFinished(t -> {
+                            circle.setFill(Color.GRAY);
+                            stShowBack.play();
+                        });
+                        stHideFront.play();
+                        count++;
                     });
-                    stHideFront.play();
-                    count++;
-                });
-                pennyGrid.add(circle, m, n, 1, 1);
+                    pennyGrid.add(circle, m, n, 1, 1);
+                    pennyCount++;
+                }
             }
+        } else {
+            fillAll(pennyGrid, Color.BLACK);
         }
+    }
+
+    // Assumes all children are circles
+    private void fillAll(GridPane gridPane, Color color) {
+        gridPane.getChildren().forEach(child -> ((Circle) child).setFill(color));
     }
 
     @Override

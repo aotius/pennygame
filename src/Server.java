@@ -4,8 +4,8 @@ import java.util.*;
 
 public class Server {
     private static final int MAX_PLAYERS = 4;
-    private static final int BATCH_SIZE = 20;
-    private static final int TOTAL_PENNIES = 20;
+    private static final int BATCH_SIZE = 8;
+    private static final int TOTAL_PENNIES = 16;
     private static final int BATCHES = TOTAL_PENNIES / BATCH_SIZE;
 
     public static void main(String[] args) throws Exception {
@@ -21,17 +21,15 @@ public class Server {
 
             System.out.println("Initializing new player");
 
-            final Player player = new Player(connection, 0);
-
+            final Player player = new Player(connection, BATCH_SIZE);
             if (!players.isEmpty()) {
                 players.get(players.size() - 1).setNext(player);
             }
-
             players.add(player);
             player.start();
 
             // players.size() == 4
-            if (true) {
+            if (players.size() == 2) {
                 System.out.println("starting game");
                 final Player firstPlayer = players.get(0);
                 firstPlayer.setBatches(BATCHES);

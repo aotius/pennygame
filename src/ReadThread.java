@@ -26,8 +26,9 @@ public final class ReadThread extends Thread {
                 return;
             }
             try {
-                System.out.println("CRT has received new batch(s)");
-                batches += inputStream.readInt();
+                final int num = inputStream.readInt();
+                System.out.printf("CRT has received new batch(s) %d%n", num);
+                batches += num;
             } catch (Exception e) {
                 // TODO handle error?
             }
