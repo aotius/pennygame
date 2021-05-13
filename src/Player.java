@@ -1,30 +1,55 @@
-import java.util.UUID;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
 
-public class Player {
-    private final UUID uuid;
-    private int batches;
-    private int pennies;
+public class Player extends Thread {
+    private Player next;
+    private int batchesRemaining;
+    private Socket socket;
+    private DataInputStream inputStream;
+    private DataOutputStream outputStream;
 
-    public Player() {
-        this.uuid = UUID.randomUUID();
-        this.batches = 0;
-        this.pennies = 0;
+    public Player(Socket socket, int batchesRemaining) {
+        this.next = null;
+        try {
+            this.socket = socket;
+            this.inputStream = new DataInputStream(socket.getInputStream());
+            this.outputStream = new DataOutputStream(socket.getOutputStream());
+            outputStream.writeInt(batchesRemaining);
+        } catch (Exception e) {
+            this.socket = null;
+            this.inputStream = null;
+            this.outputStream = null;
+            e.printStackTrace();
+        }
     }
 
-    public int getPennies() {
-        return pennies;
+    public void setNext(Player next) {
+        this.next = next;
     }
 
-    public void setPennies(int pennies) {
-        this.pennies = pennies;
+    public void setBatchesRemaining(int batchesRemaining) {
+        this.batchesRemaining = batchesRemaining;
     }
 
-    public void addPenny() {
-        this.pennies++;
-    }
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                if (batchesRemaining != 0) {
 
-    public UUID getUuid() {
-        return uuid;
+                }
+                final int code = inputStream.readInt();
+
+//                final UUID nextPlayer = player.getNextPlayer();
+//                if (nextPlayer == null) {
+//                    return;
+//                }
+                // TODO something
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

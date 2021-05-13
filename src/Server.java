@@ -1,7 +1,6 @@
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Server {
     private static final int MAX_PLAYERS = 4;
@@ -12,17 +11,28 @@ public class Server {
     public static void main(String[] args) throws Exception {
         final ServerSocket socket = new ServerSocket(1234);
 
-        // TODO
-        final List<Player> players = new LinkedList<>();
+        final List<Player> players = new ArrayList<>();
 
         while (true) {
             final Socket connection = socket.accept();
             if (connection == null) {
                 continue;
             }
-            final Player player = new Player();
+
+            final Player player = new Player(connection, 0);
+
+            if (!players.isEmpty()) {
+                players.get(players.size() - 1).setNext(player);
+            }
+
             players.add(player);
-            // TODO init
+            final Player clientWriteThread = new Player(connection, BATCH_SIZE);
+            clientWriteThread.start();
+
+            if (players.size() == 4) {
+                final Player firstPlayer = players.get(0);
+                firstPlayer.setBatchesRemaining(BATCHES);
+            }
         }
 
     }

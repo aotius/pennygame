@@ -8,13 +8,28 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
+
 public class Client extends Application {
     private static final int ROWS = 4;
     private static final int COLUMNS = 5;
+    private Socket socket;
+    private DataInputStream inputStream;
+    private DataOutputStream outputStream;
+    // The batch size (e.g. - 20, 5)
+    private int batchSize;
+    // How many coins the user has flipped in their current batch
     private int count = 0;
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws Exception {
+        socket = new Socket("localhost", 1234);
+        inputStream = new DataInputStream(socket.getInputStream());
+        outputStream = new DataOutputStream(socket.getOutputStream());
+        batchSize = inputStream.readInt();
+
         final VBox vbox = new VBox();
 
         final HBox hBoxTop = new HBox();
@@ -26,11 +41,9 @@ public class Client extends Application {
         pennyGrid.setVgap(10);
 
         for (int n = 0; n < ROWS; n++) {
-            for  (int m = 0; m < COLUMNS; m++) {
+            for (int m = 0; m < COLUMNS; m++) {
                 final Circle circle = new Circle(30, Color.BLACK);
-                // TODO button click
                 circle.setOnMouseClicked(event -> {
-                    System.out.println(count);
                     if (circle.getFill() == Color.GRAY) {
                         return;
                     }
@@ -44,8 +57,15 @@ public class Client extends Application {
 
         final Button button = new Button("Pass Pennies");
         button.setOnAction(event -> {
-            if (count != 20) {
-
+            if (count != batchSize) {
+                return;
+            }
+            try {
+                outputStream.writeInt(6000);
+                count = 0;
+                pennyGrid.getChildren().forEach(child -> ((Circle) child).setFill(Color.BLACK));
+            } catch (Exception e) {
+                e.printStackTrace();;
             }
         });
         hBoxTop.getChildren().add(button);
@@ -84,7 +104,13 @@ public class Client extends Application {
 
     @Override
     public void stop() {
-        // TODO client cleanup
+        try {
+            socket.close();
+            inputStream.close();
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
