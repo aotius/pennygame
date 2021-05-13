@@ -120,8 +120,12 @@ public class Client extends Application {
     }
 
     public void initPennies(GridPane pennyGrid) {
+        int pennyCount = 0;
         for (int n = 0; n < ROWS; n++) {
             for (int m = 0; m < COLUMNS; m++) {
+                if (pennyCount > batchSize) {
+                    return;
+                }
                 final Circle circle = new Circle(30, Color.BLACK);
                 circle.setOnMouseClicked(event -> {
                     if (circle.getFill() == Color.GRAY) {
