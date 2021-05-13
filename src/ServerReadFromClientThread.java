@@ -2,14 +2,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
-public class Player extends Thread {
-    private Player next;
+public class ServerReadFromClientThread extends Thread {
+    private ServerReadFromClientThread next;
     private int batches;
     private Socket socket;
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
 
-    public Player(Socket socket, int batchSize) {
+    public ServerReadFromClientThread(Socket socket, int batchSize) {
         this.next = null;
         this.batches = 0;
         try {
@@ -17,6 +17,19 @@ public class Player extends Thread {
             this.inputStream = new DataInputStream(socket.getInputStream());
             this.outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeInt(batchSize);
+            new Thread(() -> {
+                while (true) {
+                    if (batches != 0) {
+                        System.out.printf("Sending batches to client %d%n", batches);
+                        try {
+                            outputStream.writeInt(batches);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        batches = 0;
+                    }
+                }
+            }).start();
         } catch (Exception e) {
             this.socket = null;
             this.inputStream = null;
@@ -25,7 +38,11 @@ public class Player extends Thread {
         }
     }
 
-    public void setNext(Player next) {
+    public DataOutputStream getOutputStream() {
+        return outputStream;
+    }
+
+    public void setNext(ServerReadFromClientThread next) {
         this.next = next;
     }
 
@@ -41,16 +58,13 @@ public class Player extends Thread {
     public void run() {
         while (true) {
             try {
-                if (batches != 0) {
-                    System.out.printf("Sending batches to client %d%n", batches);
-                    outputStream.writeInt(batches);
-                    batches = 0;
-                }
+                System.out.println("Player");
 
+                // TODO fix blocking operation
                 final int batchComplete = inputStream.readInt();
                 System.out.println("Player received message from client");
                 if (next == null) {
-                    return;
+                    continue;
                 }
                 System.out.println("Sending batch to the next player");
                 next.addBatch();
