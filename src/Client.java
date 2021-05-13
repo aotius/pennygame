@@ -1,3 +1,6 @@
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
@@ -10,8 +13,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -23,6 +24,7 @@ public class Client extends Application {
     private Socket socket;
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
+    private Timeline timeline;
     // The batch size (e.g. - 20, 5)
     private int batchSize;
     // How many coins the user has flipped in their current batch
@@ -46,32 +48,6 @@ public class Client extends Application {
         pennyGrid.setHgap(10);
         pennyGrid.setVgap(10);
 
-        for (int n = 0; n < ROWS; n++) {
-            for (int m = 0; m < COLUMNS; m++) {
-                final Circle circle = new Circle(30, Color.BLACK);
-                circle.setOnMouseClicked(event -> {
-                    if (circle.getFill() == Color.GRAY) {
-                        return;
-                    }
-                    ScaleTransition stHideFront = new ScaleTransition(Duration.millis(500), circle);
-                    stHideFront.setFromX(1);
-                    stHideFront.setToX(0);
-                    ScaleTransition stShowBack = new ScaleTransition(Duration.millis(500), circle);
-                    stShowBack.setFromX(0);
-                    stShowBack.setToX(1);
-                    stHideFront.setOnFinished(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent t) {
-                            circle.setFill(Color.GRAY);
-                            stShowBack.play();
-                        }
-                    });
-                    stHideFront.play();
-                    count++;
-                });
-                pennyGrid.add(circle, m, n, 1, 1);
-            }
-        }
         hBoxTop.getChildren().add(pennyGrid);
 
         final Button button = new Button("Pass Pennies");
@@ -84,7 +60,7 @@ public class Client extends Application {
                 count = 0;
                 pennyGrid.getChildren().forEach(child -> ((Circle) child).setFill(Color.BLACK));
             } catch (Exception e) {
-                e.printStackTrace();;
+                e.printStackTrace();
             }
         });
         hBoxTop.getChildren().add(button);
@@ -96,9 +72,9 @@ public class Client extends Application {
             StackPane pane1 = new StackPane();
             StackPane pane2 = new StackPane();
             pane1.setStyle("-fx-border-color: black");
-            pane1.setPrefSize(70,35);
+            pane1.setPrefSize(70, 35);
             pane2.setStyle("-fx-border-color: black");
-            pane2.setPrefSize(70,35);
+            pane2.setPrefSize(70, 35);
             String player;
             if (i == 4) {
                 player = "Client";
@@ -115,7 +91,7 @@ public class Client extends Application {
             Text scoreText = new Text(score);
             pane1.getChildren().add(playerText);
             pane2.getChildren().add(scoreText);
-            scoreGrid.add(pane1, i,0);
+            scoreGrid.add(pane1, i, 0);
             scoreGrid.add(pane2, i, 1);
         }
 
@@ -124,8 +100,47 @@ public class Client extends Application {
         vbox.getChildren().add(hBoxTop);
         vbox.getChildren().add(hBoxBottom);
 
+        final ReadThread readThread = new ReadThread(socket, inputStream);
+        timeline = new Timeline();
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1), action -> {
+            final int batches = readThread.getBatches();
+            if (count != 0 || batches == 0) {
+                return;
+            }
+
+            readThread.setBatches(batches - 1);
+            initPennies(pennyGrid);
+        }));
+
         stage.setScene(new Scene(vbox));
         stage.show();
+    }
+
+    public void initPennies(GridPane pennyGrid) {
+        for (int n = 0; n < ROWS; n++) {
+            for (int m = 0; m < COLUMNS; m++) {
+                final Circle circle = new Circle(30, Color.BLACK);
+                circle.setOnMouseClicked(event -> {
+                    if (circle.getFill() == Color.GRAY) {
+                        return;
+                    }
+                    ScaleTransition stHideFront = new ScaleTransition(Duration.millis(500), circle);
+                    stHideFront.setFromX(1);
+                    stHideFront.setToX(0);
+                    ScaleTransition stShowBack = new ScaleTransition(Duration.millis(500), circle);
+                    stShowBack.setFromX(0);
+                    stShowBack.setToX(1);
+                    stHideFront.setOnFinished(t -> {
+                        circle.setFill(Color.GRAY);
+                        stShowBack.play();
+                    });
+                    stHideFront.play();
+                    count++;
+                });
+                pennyGrid.add(circle, m, n, 1, 1);
+            }
+        }
     }
 
     @Override
@@ -134,6 +149,7 @@ public class Client extends Application {
             socket.close();
             inputStream.close();
             outputStream.close();
+            timeline.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }
