@@ -1,18 +1,22 @@
-import java.io.ObjectInputStream;
+import java.io.DataInputStream;
 import java.net.Socket;
 
 public final class ReadThread extends Thread {
     private final Socket socket;
-    private final ObjectInputStream inputStream;
+    private final DataInputStream inputStream;
     private int batches;
 
-    public ReadThread(Socket socket, ObjectInputStream inputStream) {
+    public ReadThread(Socket socket, DataInputStream inputStream) {
         this.socket = socket;
         this.inputStream = inputStream;
     }
 
     public int getBatches() {
         return batches;
+    }
+
+    public void setBatches(int batches) {
+        this.batches = batches;
     }
 
     @Override
@@ -22,10 +26,10 @@ public final class ReadThread extends Thread {
                 return;
             }
             try {
-                inputStream.read();
-                final int incoming = inputStream.readInt();
-                batches = incoming;
+                System.out.println("CRT has received new batch(s)");
+                batches += inputStream.readInt();
             } catch (Exception e) {
+                // TODO handle error?
             }
         }
     }

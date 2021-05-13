@@ -19,6 +19,8 @@ public class Server {
                 continue;
             }
 
+            System.out.println("Initializing new player");
+
             final Player player = new Player(connection, 0);
 
             if (!players.isEmpty()) {
@@ -26,12 +28,13 @@ public class Server {
             }
 
             players.add(player);
-            final Player clientWriteThread = new Player(connection, BATCH_SIZE);
-            clientWriteThread.start();
+            player.start();
 
-            if (players.size() == 4) {
+            // players.size() == 4
+            if (true) {
+                System.out.println("starting game");
                 final Player firstPlayer = players.get(0);
-                firstPlayer.setBatchesRemaining(BATCHES);
+                firstPlayer.setBatches(BATCHES);
             }
         }
 

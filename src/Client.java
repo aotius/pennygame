@@ -112,6 +112,8 @@ public class Client extends Application {
             readThread.setBatches(batches - 1);
             initPennies(pennyGrid);
         }));
+        readThread.start();
+        timeline.play();
 
         stage.setScene(new Scene(vbox));
         stage.show();
