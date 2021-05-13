@@ -1,5 +1,7 @@
 import javafx.application.Application;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
@@ -7,6 +9,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -33,6 +38,7 @@ public class Client extends Application {
         final VBox vbox = new VBox();
 
         final HBox hBoxTop = new HBox();
+        hBoxTop.setAlignment(Pos.CENTER);
         final HBox hBoxBottom = new HBox();
 
         final GridPane pennyGrid = new GridPane();
@@ -47,7 +53,20 @@ public class Client extends Application {
                     if (circle.getFill() == Color.GRAY) {
                         return;
                     }
-                    circle.setFill(Color.GRAY);
+                    ScaleTransition stHideFront = new ScaleTransition(Duration.millis(500), circle);
+                    stHideFront.setFromX(1);
+                    stHideFront.setToX(0);
+                    ScaleTransition stShowBack = new ScaleTransition(Duration.millis(500), circle);
+                    stShowBack.setFromX(0);
+                    stShowBack.setToX(1);
+                    stHideFront.setOnFinished(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent t) {
+                            circle.setFill(Color.GRAY);
+                            stShowBack.play();
+                        }
+                    });
+                    stHideFront.play();
                     count++;
                 });
                 pennyGrid.add(circle, m, n, 1, 1);
@@ -72,26 +91,33 @@ public class Client extends Application {
 
         // TODO bottom half of the UI (clean this up maybe)
         final GridPane scoreGrid = new GridPane();
-        Text p1 = new Text("Player 1");
-        Text p2 = new Text("Player 2");
-        Text p3 = new Text("Player 3");
-        Text p4 = new Text("Player 4");
-        Text p5 = new Text("Client");
-        Text p1score = new Text("20");
-        Text p2score = new Text("0");
-        Text p3score = new Text("0");
-        Text p4score = new Text("0");
-        Text p5score = new Text("0");
-        scoreGrid.add(p1, 0, 0);
-        scoreGrid.add(p2, 1, 0);
-        scoreGrid.add(p3, 2, 0);
-        scoreGrid.add(p4, 3, 0);
-        scoreGrid.add(p5, 4, 0);
-        scoreGrid.add(p1score, 0, 1);
-        scoreGrid.add(p2score, 1, 1);
-        scoreGrid.add(p3score, 2, 1);
-        scoreGrid.add(p4score, 3, 1);
-        scoreGrid.add(p5score, 4, 1);
+        scoreGrid.setAlignment(Pos.CENTER);
+        for (int i = 0; i < 5; i++) {
+            StackPane pane1 = new StackPane();
+            StackPane pane2 = new StackPane();
+            pane1.setStyle("-fx-border-color: black");
+            pane1.setPrefSize(70,35);
+            pane2.setStyle("-fx-border-color: black");
+            pane2.setPrefSize(70,35);
+            String player;
+            if (i == 4) {
+                player = "Client";
+            } else {
+                player = String.format("Player %d", i + 1);
+            }
+            Text playerText = new Text(player);
+            String score;
+            if (i == 0) {
+                score = "20";
+            } else {
+                score = "0";
+            }
+            Text scoreText = new Text(score);
+            pane1.getChildren().add(playerText);
+            pane2.getChildren().add(scoreText);
+            scoreGrid.add(pane1, i,0);
+            scoreGrid.add(pane2, i, 1);
+        }
 
         hBoxBottom.getChildren().add(scoreGrid);
 
