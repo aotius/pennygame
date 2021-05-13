@@ -1,7 +1,7 @@
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 public class Client extends Application {
     private static final int ROWS = 4;
     private static final int COLUMNS = 5;
+    private int count = 0;
 
     @Override
     public void start(Stage stage) {
@@ -18,7 +19,6 @@ public class Client extends Application {
 
         final HBox hBoxTop = new HBox();
         final HBox hBoxBottom = new HBox();
-
 
         final GridPane pennyGrid = new GridPane();
         pennyGrid.setPadding(new Insets(10, 10, 10, 10));
@@ -30,15 +30,25 @@ public class Client extends Application {
                 final Circle circle = new Circle(30, Color.BLACK);
                 // TODO button click
                 circle.setOnMouseClicked(event -> {
-                    circle.setFill(circle.getFill() == Color.BLACK ? Color.GRAY : Color.BLACK);
+                    System.out.println(count);
+                    if (circle.getFill() == Color.GRAY) {
+                        return;
+                    }
+                    circle.setFill(Color.GRAY);
+                    count++;
                 });
                 pennyGrid.add(circle, m, n, 1, 1);
             }
         }
         hBoxTop.getChildren().add(pennyGrid);
 
-        // TODO arrow to pass coin to next player
-        hBoxTop.getChildren().add(new Label("placeholder"));
+        final Button button = new Button("Pass Pennies");
+        button.setOnAction(event -> {
+            if (count != 20) {
+
+            }
+        });
+        hBoxTop.getChildren().add(button);
 
         // TODO bottom half of the UI (clean this up maybe)
         final GridPane scoreGrid = new GridPane();
