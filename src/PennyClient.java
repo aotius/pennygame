@@ -98,6 +98,11 @@ public class PennyClient extends Application {
                 initPennies(pennyGrid);
             }
         }));
+        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1), action -> {
+            for (int i = 0; i < clientReadFromServerThread.internalScoreboard.size(); i++) {
+                updatePlayerScore(scoreGrid, i, clientReadFromServerThread.internalScoreboard.get(i));
+            }
+        }));
         clientReadFromServerThread.start();
         timeline.play();
 
@@ -119,6 +124,10 @@ public class PennyClient extends Application {
 
         stage.setScene(new Scene(vbox));
         stage.show();
+    }
+
+    public void updatePlayerScore(GridPane scoreGrid, int playerIndex, int value) {
+        ((Text)((StackPane)scoreGrid.getChildren().get(playerIndex * 2 + 1)).getChildren().get(0)).setText(String.valueOf(value));
     }
 
     public void initPennies(GridPane pennyGrid) {
