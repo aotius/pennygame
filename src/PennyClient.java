@@ -89,7 +89,7 @@ public class PennyClient extends Application {
         //final Label labelFirstBatch = new Label("First Batch: ...");
         final StackPane pane3 = new StackPane();
         pane3.setStyle("-fx-border-color: black");
-        pane3.setPrefSize(70, 70);
+        pane3.setPrefSize(200, 70);
         final Label labelTotalTime = new Label("Total Time: ...");
         //times.getChildren().add(labelFirstBatch);
         pane3.getChildren().add(labelTotalTime);
