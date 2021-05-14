@@ -126,6 +126,7 @@ public class PennyClient extends Application {
         stage.setWidth(450);
         stage.setHeight(300);
         stage.setTitle("Agile Penny Game");
+        stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.png" ))); 
         stage.show();
     }
 
