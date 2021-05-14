@@ -87,9 +87,13 @@ public class PennyClient extends Application {
 
         final VBox times = new VBox();
         //final Label labelFirstBatch = new Label("First Batch: ...");
+        final StackPane pane3 = new StackPane();
+        pane3.setStyle("-fx-border-color: black");
+        pane3.setPrefSize(70, 70);
         final Label labelTotalTime = new Label("Total Time: ...");
         //times.getChildren().add(labelFirstBatch);
-        times.getChildren().add(labelTotalTime);
+        pane3.getChildren().add(labelTotalTime);
+        times.getChildren().add(pane3);
         hBoxBottom.getChildren().add(times);
 
         vbox.getChildren().add(hBoxTop);
