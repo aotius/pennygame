@@ -105,7 +105,8 @@ public class ServerReadFromClientThread extends Thread {
                     }
 
                     if (gameOver) {
-                        System.out.println("gameover");
+                        final String gameTime = String.format("2,%d", System.currentTimeMillis() - PennyServer.startTime);
+                        broadcast(gameTime);
                     }
 
                     continue;

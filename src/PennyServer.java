@@ -7,11 +7,9 @@ public class PennyServer {
     public static final int BATCH_SIZE = 20;
     public static final int TOTAL_PENNIES = 20;
     public static final int BATCHES = TOTAL_PENNIES / BATCH_SIZE;
-    private static long time = 0;
+    public static long startTime;
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Server started");
-
         final ServerSocket socket = new ServerSocket(1234);
 
         final List<ServerReadFromClientThread> serverReadFromClientThreads = new ArrayList<>();
@@ -33,7 +31,7 @@ public class PennyServer {
 
             if (serverReadFromClientThreads.size() == MAX_PLAYERS) {
                 System.out.println("starting game");
-                time = System.currentTimeMillis();
+                startTime = System.currentTimeMillis();
                 final ServerReadFromClientThread firstServerReadFromClientThread = serverReadFromClientThreads.get(0);
                 firstServerReadFromClientThread.setBatches(BATCHES);
             }

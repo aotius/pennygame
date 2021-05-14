@@ -8,6 +8,7 @@ public final class ClientReadFromServerThread extends Thread {
     private final DataInputStream inputStream;
     private int batches;
     ArrayList<Integer> internalScoreboard = new ArrayList<>();
+    private String timeElapsed = null;
 
 
     public ClientReadFromServerThread(Socket socket, DataInputStream inputStream) {
@@ -24,6 +25,10 @@ public final class ClientReadFromServerThread extends Thread {
         this.batches = batches;
     }
 
+    public String getTimeElapsed() {
+        return timeElapsed;
+    }
+
     @Override
     public void run() {
         while (true) {
@@ -33,15 +38,17 @@ public final class ClientReadFromServerThread extends Thread {
             try {
                 String line = inputStream.readUTF();
                 System.out.println("input rcv from server: " + line);
-                int[] numbers = Arrays.stream(line.split(",")).mapToInt(Integer::parseInt).toArray();
+                long[] numbers = Arrays.stream(line.split(",")).mapToLong(Long::parseLong).toArray();
                 if (numbers[0] == 0) {
                     System.out.printf("CRT has received new batch(s) %d%n", numbers[1]);
                     batches += numbers[1];
                 } else if (numbers[0] == 1) {
                     System.out.println("Update scoreboard");
-                    int index = numbers[1];
+                    int index = (int) numbers[1];
                     internalScoreboard.set(index + 1, internalScoreboard.get(index + 1) + PennyServer.BATCH_SIZE);
                     internalScoreboard.set(index, internalScoreboard.get(index) - PennyServer.BATCH_SIZE);
+                } else if (numbers[0] == 2) {
+                    timeElapsed = String.format("%,ds", numbers[1] / 1000);
                 }
             } catch (Exception e) {
                 // TODO handle error?

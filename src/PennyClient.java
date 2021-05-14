@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -85,9 +86,9 @@ public class PennyClient extends Application {
         hBoxBottom.getChildren().add(scoreGrid);
 
         final VBox times = new VBox();
-        final Label labelFirstBatch = new Label("First Batch: ...");
+        //final Label labelFirstBatch = new Label("First Batch: ...");
         final Label labelTotalTime = new Label("Total Time: ...");
-        times.getChildren().add(labelFirstBatch);
+        //times.getChildren().add(labelFirstBatch);
         times.getChildren().add(labelTotalTime);
         hBoxBottom.getChildren().add(times);
 
@@ -99,7 +100,7 @@ public class PennyClient extends Application {
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(0.5), action -> {
             final int batches = clientReadFromServerThread.getBatches();
-            System.out.printf("count: %d, batches: %d%n", count, batches);
+            //System.out.printf("count: %d, batches: %d%n", count, batches);
             if (readyForNextBatch && batches != 0) {
                 System.out.println("Refreshing board");
                 clientReadFromServerThread.setBatches(batches - 1);
@@ -111,12 +112,19 @@ public class PennyClient extends Application {
                 updatePlayerScore(scoreGrid, i, clientReadFromServerThread.internalScoreboard.get(i));
             }
         }));
+        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1), action -> {
+            final String timeElapsed = clientReadFromServerThread.getTimeElapsed();
+            if (timeElapsed == null) {
+                return;
+            }
+            labelTotalTime.setText(timeElapsed);
+        }));
         clientReadFromServerThread.start();
         timeline.play();
 
         final Button button = new Button("Pass Pennies");
         button.setOnAction(event -> {
-            if (count != batchSize) {
+            if (count < batchSize) {
                 return;
             }
             try {
@@ -131,10 +139,11 @@ public class PennyClient extends Application {
         hBoxTop.getChildren().add(button);
 
         stage.setScene(new Scene(vbox));
-        stage.setWidth(450);
-        stage.setHeight(300);
+        stage.setWidth(800);
+        stage.setHeight(600);
+        stage.setResizable(false);
         stage.setTitle("Agile Penny Game");
-        stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.png" ))); 
+        stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.jpg" )));
         stage.show();
     }
 
