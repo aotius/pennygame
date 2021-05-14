@@ -64,8 +64,6 @@ public class ServerReadFromClientThread extends Thread {
         });
     }
 
-
-
     @Override
     public void run() {
         new Thread(() -> {
@@ -99,6 +97,17 @@ public class ServerReadFromClientThread extends Thread {
                 System.out.println("Send index of player rcving batch");
 
                 if (next == null) {
+                    boolean gameOver = true;
+                    for (ServerReadFromClientThread user : users) {
+                        if (user.getBatches() != 0) {
+                            gameOver = false;
+                        }
+                    }
+
+                    if (gameOver) {
+                        System.out.println("gameover");
+                    }
+
                     continue;
                 }
                 System.out.println("Sending batch to the next player");

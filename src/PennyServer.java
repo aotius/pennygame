@@ -19,11 +19,6 @@ public class PennyServer {
         while (true) {
             final Socket connection = socket.accept();
             if (connection == null) {
-                if (serverReadFromClientThreads.get(0).getBatches() == 0 && serverReadFromClientThreads.get(1).getBatches() == 0
-                        && serverReadFromClientThreads.get(2).getBatches() == 0 && serverReadFromClientThreads.get(3).getBatches() == 0) {
-                    time = System.currentTimeMillis() - time;
-                    time /= 1000;
-                }
                 continue;
             }
 

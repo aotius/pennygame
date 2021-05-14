@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -82,6 +83,13 @@ public class PennyClient extends Application {
         }
 
         hBoxBottom.getChildren().add(scoreGrid);
+
+        final VBox times = new VBox();
+        final Label labelFirstBatch = new Label("First Batch: ...");
+        final Label labelTotalTime = new Label("Total Time: ...");
+        times.getChildren().add(labelFirstBatch);
+        times.getChildren().add(labelTotalTime);
+        hBoxBottom.getChildren().add(times);
 
         vbox.getChildren().add(hBoxTop);
         vbox.getChildren().add(hBoxBottom);
