@@ -12,6 +12,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -147,7 +149,7 @@ public class PennyClient extends Application {
         stage.setHeight(600);
         stage.setResizable(false);
         stage.setTitle("Agile Penny Game");
-        stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.jpg" )));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.png" )));
         stage.show();
     }
 
@@ -165,25 +167,32 @@ public class PennyClient extends Application {
                     if (pennyCount >= batchSize) {
                         return;
                     }
-                    final Circle circle = new Circle(30, Color.BLACK);
-                    circle.setOnMouseClicked(event -> {
-                        if (circle.getFill() == Color.GRAY) {
+                    final Image image = new Image(getClass().getResourceAsStream("icon.png"));
+                    final Image back = new Image(getClass().getResourceAsStream("inverseicon.png"));
+                    final Circle circle = new Circle(30, Color.GRAY);
+                    final ImageView penny = new ImageView();
+                    penny.setImage(image);
+                    penny.setFitWidth(80);
+                    penny.setFitHeight(80);
+                    penny.setOnMouseClicked(event -> {
+                        if (penny.getImage() == back) {
                             return;
                         }
-                        ScaleTransition stHideFront = new ScaleTransition(Duration.millis(250), circle);
+                        ScaleTransition stHideFront = new ScaleTransition(Duration.millis(250), penny);
                         stHideFront.setFromX(1);
                         stHideFront.setToX(0);
-                        ScaleTransition stShowBack = new ScaleTransition(Duration.millis(250), circle);
-                        stShowBack.setFromX(0);
-                        stShowBack.setToX(1);
                         stHideFront.setOnFinished(t -> {
-                            circle.setFill(Color.GRAY);
+                            penny.setImage(back);
+                            ScaleTransition stShowBack = new ScaleTransition(Duration.millis(250), penny);
+                            stShowBack.setFromX(0);
+                            stShowBack.setToX(1);
+                            //circle.setFill(Color.GRAY);
                             stShowBack.play();
                         });
                         stHideFront.play();
                         count++;
                     });
-                    pennyGrid.add(circle, m, n, 1, 1);
+                    pennyGrid.add(penny, m, n, 1, 1);
                     pennyCount++;
                 }
             }
