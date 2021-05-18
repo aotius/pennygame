@@ -18,7 +18,6 @@ public class PennyServer extends Thread {
     public void run() {
         try {
             ServerSocket socket = new ServerSocket(1234);
-            System.out.println("HELLO");
 
             final List<ServerReadFromClientThread> serverReadFromClientThreads = new ArrayList<>();
 
@@ -38,7 +37,7 @@ public class PennyServer extends Thread {
                 serverReadFromClientThread.start();
 
                 if (serverReadFromClientThreads.size() == MAX_PLAYERS) {
-                    System.out.println("starting game");
+                    System.out.println("Starting game");
                     startTime = System.currentTimeMillis();
                     final ServerReadFromClientThread firstServerReadFromClientThread = serverReadFromClientThreads.get(0);
                     firstServerReadFromClientThread.setBatches(BATCHES);

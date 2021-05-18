@@ -6,7 +6,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -53,8 +52,10 @@ public class MainApplicationScreen extends Application {
             try {
                 //  TODO get info and set info on batch size
                 int batchSize = 20;
+                System.out.println("Spinning up server");
                 PennyServer server = new PennyServer(batchSize);
                 server.start();
+                System.out.println("Switching to PennyClient view");
                 PennyClient client = new PennyClient(stage);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -66,6 +67,7 @@ public class MainApplicationScreen extends Application {
         button2.setStyle("-fx-font-size:18");
         button2.setOnAction(event -> {
             try {
+                System.out.println("Switching to PennyClient view");
                 PennyClient client = new PennyClient(stage);
             } catch (Exception e) {
                 e.printStackTrace();

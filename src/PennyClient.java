@@ -43,13 +43,12 @@ public class PennyClient {
         final VBox vTop = new VBox();
         final StackPane pane = new StackPane();
         final StackPane panepane = new StackPane();
-        String text = "Click the pennies in the batch to flip them over\nClick the button on the right to pass to the next player\nScoreboard below displays where the pennies are in real-time";
-        final Text instructions = new Text();
-        instructions.setText(text);
-        String text2 = "Instructions";
-        final Text header = new Text();
+        final Text instructions = new Text("Click the pennies in the batch to flip them over" +
+                "\nClick the button on the right to pass to the next player" +
+                "\nScoreboard below displays where the pennies are in real-time");
+        final Text header = new Text("Instructions");
+
         header.setFont(Font.font("arial", FontWeight.BOLD, FontPosture.REGULAR, 20));
-        header.setText(text2);
         pane.getChildren().add(header);
         pane.setPadding(new Insets(10,10,10,10));
         panepane.setPadding(new Insets(10,10,10,10));
