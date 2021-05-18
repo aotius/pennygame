@@ -25,7 +25,7 @@ public class MainApplicationScreen extends Application {
         vbox.getChildren().add(title);
         final Button button = new Button("Host Game");
         button.setPrefSize(150,50);
-        button.setStyle("-fx.font-size:40");
+        button.setStyle("-fx-font-size:18");
         button.setOnAction(event -> {
             try {
                 //  TODO get info and set info on batch size
@@ -40,7 +40,7 @@ public class MainApplicationScreen extends Application {
 
         final Button button2 = new Button("Join Game");
         button2.setPrefSize(150,50);
-        button2.setStyle("-fx.font-size:40");
+        button2.setStyle("-fx-font-size:18");
         button2.setOnAction(event -> {
             try {
                 PennyClient client = new PennyClient(stage);
