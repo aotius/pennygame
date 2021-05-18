@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -27,23 +28,19 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.Stack;
 
-public class PennyClient extends Application {
+public class PennyClient {
     private static final int ROWS = 4;
     private static final int COLUMNS = 5;
-    private Socket socket;
-    private DataInputStream inputStream;
-    private DataOutputStream outputStream;
-    private Timeline timeline;
+    private final DataOutputStream outputStream;
     // The batch size (e.g. - 20, 5)
-    private int batchSize;
+    private final int batchSize;
     // How many coins the user has flipped in their current batch
     private int count = 0;
     private boolean readyForNextBatch = true;
 
-    @Override
-    public void start(Stage stage) throws Exception {
-        socket = new Socket("localhost", 1234);
-        inputStream = new DataInputStream(socket.getInputStream());
+    public PennyClient(Stage stage) throws Exception {
+        Socket socket = new Socket("localhost", 1234);
+        DataInputStream inputStream = new DataInputStream(socket.getInputStream());
         outputStream = new DataOutputStream(socket.getOutputStream());
         batchSize = inputStream.readInt();
 
@@ -135,7 +132,7 @@ public class PennyClient extends Application {
         vbox.getChildren().add(hBoxBottom);
 
         final ClientReadFromServerThread clientReadFromServerThread = new ClientReadFromServerThread(socket, inputStream);
-        timeline = new Timeline();
+        Timeline timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(0.5), action -> {
             final int batches = clientReadFromServerThread.getBatches();
@@ -220,6 +217,7 @@ public class PennyClient extends Application {
                             ScaleTransition stShowBack = new ScaleTransition(Duration.millis(250), penny);
                             stShowBack.setFromX(0);
                             stShowBack.setToX(1);
+                            //circle.setFill(Color.GRAY);
                             stShowBack.play();
                         });
                         stHideFront.play();
@@ -239,16 +237,16 @@ public class PennyClient extends Application {
         gridPane.getChildren().forEach(child -> ((Circle) child).setFill(color));
     }
 
-    @Override
-    public void stop() {
-        try {
-            socket.close();
-            inputStream.close();
-            outputStream.close();
-            timeline.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @Override
+//    public void stop() {
+//        try {
+//            socket.close();
+//            inputStream.close();
+//            outputStream.close();
+//            timeline.stop();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }

@@ -114,7 +114,7 @@ public class ServerReadFromClientThread extends Thread {
                 System.out.println("Sending batch to the next player");
                 next.addBatch();
             } catch (Exception e) {
-                e.printStackTrace();
+                this.stop();
             }
         }
     }
