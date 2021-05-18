@@ -1,11 +1,9 @@
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Application;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,12 +11,10 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.image.ImageView;
-import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -26,7 +22,6 @@ import javafx.util.Duration;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
-import java.util.Stack;
 
 public class PennyClient {
     private static final int ROWS = 4;
@@ -77,7 +72,7 @@ public class PennyClient {
         pennyGrid.setVgap(10);
         pennyGrid.setPrefSize(450, 370);
 
-        final Image board = new Image(getClass().getResourceAsStream("gameboard.png"));
+        final Image board = new Image(getClass().getResourceAsStream("resources/gameboard.png"));
         final ImageView gameboard = new ImageView();
         gameboard.setImage(board);
         gameBoard.getChildren().add(gameboard);
@@ -180,7 +175,7 @@ public class PennyClient {
         stage.setHeight(650);
         stage.setResizable(false);
         stage.setTitle("Agile Penny Game");
-        stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.png" )));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("resources/icon.png")));
         stage.show();
     }
 
@@ -198,8 +193,8 @@ public class PennyClient {
                     if (pennyCount >= batchSize) {
                         return;
                     }
-                    final Image image = new Image(getClass().getResourceAsStream("icon.png"));
-                    final Image back = new Image(getClass().getResourceAsStream("inverseicon.png"));
+                    final Image image = new Image(getClass().getResourceAsStream("resources/icon.png"));
+                    final Image back = new Image(getClass().getResourceAsStream("resources/inverseicon.png"));
                     final Circle circle = new Circle(30, Color.GRAY);
                     final ImageView penny = new ImageView();
                     penny.setImage(image);

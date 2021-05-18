@@ -5,10 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
-import java.util.concurrent.TimeUnit;
 
 public class MainApplicationScreen extends Application {
 
@@ -52,7 +49,7 @@ public class MainApplicationScreen extends Application {
         stage.setHeight(600);
         stage.setResizable(false);
         stage.setTitle("Agile Penny Game");
-        stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.png" )));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("resources/icon.png")));
         stage.show();
     }
 }
