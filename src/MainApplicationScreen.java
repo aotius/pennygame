@@ -52,7 +52,7 @@ public class MainApplicationScreen extends Application {
         stage.setHeight(600);
         stage.setResizable(false);
         stage.setTitle("Agile Penny Game");
-        stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.jpg" )));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.png" )));
         stage.show();
     }
 }

@@ -134,7 +134,7 @@ public class PennyClient {
         final ClientReadFromServerThread clientReadFromServerThread = new ClientReadFromServerThread(socket, inputStream);
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(0.5), action -> {
+        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(0.05), action -> {
             final int batches = clientReadFromServerThread.getBatches();
             //System.out.printf("count: %d, batches: %d%n", count, batches);
             if (readyForNextBatch && batches != 0) {
@@ -236,17 +236,5 @@ public class PennyClient {
     private void fillAll(GridPane gridPane, Color color) {
         gridPane.getChildren().forEach(child -> ((Circle) child).setFill(color));
     }
-
-//    @Override
-//    public void stop() {
-//        try {
-//            socket.close();
-//            inputStream.close();
-//            outputStream.close();
-//            timeline.stop();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
 }
