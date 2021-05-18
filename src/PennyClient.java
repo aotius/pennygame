@@ -13,7 +13,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.image.Image;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -21,6 +25,7 @@ import javafx.util.Duration;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.Stack;
 
 public class PennyClient extends Application {
     private static final int ROWS = 4;
@@ -43,17 +48,44 @@ public class PennyClient extends Application {
         batchSize = inputStream.readInt();
 
         final VBox vbox = new VBox();
+        final VBox vTop = new VBox();
+        final StackPane pane = new StackPane();
+        final StackPane panepane = new StackPane();
+        String text = "Click the pennies in the batch to flip them over\nClick the button on the right to pass to the next player\nScoreboard below displays where the pennies are in real-time";
+        final Text instructions = new Text();
+        instructions.setText(text);
+        String text2 = "Instructions";
+        final Text header = new Text();
+        header.setFont(Font.font("arial", FontWeight.BOLD, FontPosture.REGULAR, 20));
+        header.setText(text2);
+        pane.getChildren().add(header);
+        pane.setPadding(new Insets(10,10,10,10));
+        panepane.setPadding(new Insets(10,10,10,10));
+        panepane.getChildren().add(instructions);
+        pane.setAlignment(Pos.CENTER);
+        vTop.getChildren().add(pane);
+        vTop.getChildren().add(panepane);
 
         final HBox hBoxTop = new HBox();
         hBoxTop.setAlignment(Pos.CENTER);
+        hBoxTop.setSpacing(20);
         final HBox hBoxBottom = new HBox();
+        hBoxBottom.setAlignment(Pos.CENTER);
 
+        final StackPane gameBoard = new StackPane();
         final GridPane pennyGrid = new GridPane();
         pennyGrid.setPadding(new Insets(10, 10, 10, 10));
+        pennyGrid.setAlignment(Pos.CENTER);
         pennyGrid.setHgap(10);
         pennyGrid.setVgap(10);
+        pennyGrid.setPrefSize(450, 370);
 
-        hBoxTop.getChildren().add(pennyGrid);
+        final Image board = new Image(getClass().getResourceAsStream("gameboard.png"));
+        final ImageView gameboard = new ImageView();
+        gameboard.setImage(board);
+        gameBoard.getChildren().add(gameboard);
+        gameBoard.getChildren().add(pennyGrid);
+        hBoxTop.getChildren().add(gameBoard);
 
         // TODO bottom half of the UI (clean this up maybe)
         final GridPane scoreGrid = new GridPane();
@@ -98,6 +130,7 @@ public class PennyClient extends Application {
         times.getChildren().add(pane3);
         hBoxBottom.getChildren().add(times);
 
+        vbox.getChildren().add(vTop);
         vbox.getChildren().add(hBoxTop);
         vbox.getChildren().add(hBoxBottom);
 
@@ -129,6 +162,7 @@ public class PennyClient extends Application {
         timeline.play();
 
         final Button button = new Button("Pass Pennies");
+        button.setPadding(new Insets(10,10,10,10));
         button.setOnAction(event -> {
             if (count < batchSize) {
                 return;
@@ -145,8 +179,8 @@ public class PennyClient extends Application {
         hBoxTop.getChildren().add(button);
 
         stage.setScene(new Scene(vbox));
-        stage.setWidth(800);
-        stage.setHeight(600);
+        stage.setWidth(650);
+        stage.setHeight(650);
         stage.setResizable(false);
         stage.setTitle("Agile Penny Game");
         stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.png" )));
@@ -186,7 +220,6 @@ public class PennyClient extends Application {
                             ScaleTransition stShowBack = new ScaleTransition(Duration.millis(250), penny);
                             stShowBack.setFromX(0);
                             stShowBack.setToX(1);
-                            //circle.setFill(Color.GRAY);
                             stShowBack.play();
                         });
                         stHideFront.play();
