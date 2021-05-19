@@ -159,8 +159,6 @@ public class PennyClient {
         final Image passarrow = new Image(getClass().getResourceAsStream("resources/passarrow.png"));
         final ImageView button = new ImageView();
         button.setImage(passarrow);
-        Text buttonText = new Text("Pass Pennies");
-        buttonText.setFont(Font.font("Calibri", FontWeight.BOLD, 14));
         button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (count < batchSize) {
                 return;
@@ -175,7 +173,6 @@ public class PennyClient {
             }
         });
         passPane.getChildren().add(button);
-        passPane.getChildren().add(buttonText);
         hBoxTop.getChildren().add(passPane);
 
         stage.setScene(new Scene(vbox));
