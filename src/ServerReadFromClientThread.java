@@ -138,11 +138,11 @@ public class ServerReadFromClientThread extends Thread {
                     } else {
                         Logger.info("GAME NOT OVER");
                     }
+                } else {
+                    Logger.info(String.format("%s sending batch to %s", getPlayerDisplayName(playerNumber), getPlayerDisplayName(playerNumber + 1)));
+                    next.addBatch();
                 }
 
-                Logger.info(String.format("%s sending batch to %s", getPlayerDisplayName(playerNumber), getPlayerDisplayName(playerNumber + 1)));
-
-                next.addBatch();
             } catch (Exception e) {
                 e.printStackTrace();
             }
