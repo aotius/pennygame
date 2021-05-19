@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -43,12 +44,13 @@ public class PennyClient {
         final VBox vTop = new VBox();
         final StackPane pane = new StackPane();
         final StackPane panepane = new StackPane();
-        final Text instructions = new Text("Click the pennies in the batch to flip them over" +
-                "\nClick the button on the right to pass to the next player" +
-                "\nScoreboard below displays where the pennies are in real-time");
-        final Text header = new Text("Instructions");
-
+        String text = "Click the pennies in the batch to flip them over\nClick the button on the right to pass to the next player\nScoreboard below displays where the pennies are in real-time";
+        final Text instructions = new Text();
+        instructions.setText(text);
+        String text2 = "Instructions";
+        final Text header = new Text();
         header.setFont(Font.font("arial", FontWeight.BOLD, FontPosture.REGULAR, 20));
+        header.setText(text2);
         pane.getChildren().add(header);
         pane.setPadding(new Insets(10,10,10,10));
         panepane.setPadding(new Insets(10,10,10,10));
@@ -64,6 +66,7 @@ public class PennyClient {
         hBoxBottom.setAlignment(Pos.CENTER);
 
         final StackPane gameBoard = new StackPane();
+        gameBoard.setPadding(new Insets(10,10,10,10));
         final GridPane pennyGrid = new GridPane();
         pennyGrid.setPadding(new Insets(10, 10, 10, 10));
         pennyGrid.setAlignment(Pos.CENTER);
@@ -152,9 +155,13 @@ public class PennyClient {
         clientReadFromServerThread.start();
         timeline.play();
 
-        final Button button = new Button("Pass Pennies");
-        button.setPadding(new Insets(10,10,10,10));
-        button.setOnAction(event -> {
+        final StackPane passPane = new StackPane();
+        final Image passarrow = new Image(getClass().getResourceAsStream("resources/passarrow.png"));
+        final ImageView button = new ImageView();
+        button.setImage(passarrow);
+        Text buttonText = new Text("Pass Pennies");
+        buttonText.setFont(Font.font("Calibri", FontWeight.BOLD, 14));
+        button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (count < batchSize) {
                 return;
             }
@@ -162,15 +169,17 @@ public class PennyClient {
                 outputStream.writeInt(6000);
                 count = 0;
                 readyForNextBatch = true;
-                fillAll(pennyGrid, clientReadFromServerThread.getBatches() == 0 ? Color.WHITE : Color.BLACK);
+                pennyGrid.getChildren().clear();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-        hBoxTop.getChildren().add(button);
+        passPane.getChildren().add(button);
+        passPane.getChildren().add(buttonText);
+        hBoxTop.getChildren().add(passPane);
 
         stage.setScene(new Scene(vbox));
-        stage.setWidth(650);
+        stage.setWidth(700);
         stage.setHeight(650);
         stage.setResizable(false);
         stage.setTitle("Agile Penny Game");
