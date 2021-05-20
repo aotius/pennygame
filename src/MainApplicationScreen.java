@@ -105,7 +105,7 @@ public class MainApplicationScreen extends Application {
 
         stage.setScene(new Scene(vBoxRoot));
         stage.setWidth(750);
-        stage.setHeight(650);
+        stage.setHeight(750);
         stage.setResizable(false);
         stage.setTitle("Agile Penny Game");
         stage.getIcons().add(ICON);
