@@ -1,55 +1,77 @@
-import java.io.DataInputStream;
-import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ClientReadFromServerThread extends Thread {
-    private final Socket socket;
-    private final DataInputStream inputStream;
-    private int batches;
-    ArrayList<Integer> internalScoreboard = new ArrayList<>();
-    private String timeElapsed = null;
+    private final PennyClient pennyClient;
+    private AtomicInteger batches;
+    List<Integer> internalScoreboard = Arrays.asList(PennyServer.TOTAL_PENNIES, 0, 0, 0, 0);
+    private volatile String timeElapsedTotal;
+    private volatile String timeElapsedFirstBatch;
 
 
-    public ClientReadFromServerThread(Socket socket, DataInputStream inputStream) {
-        this.socket = socket;
-        this.inputStream = inputStream;
-        internalScoreboard.addAll(Arrays.asList(PennyServer.TOTAL_PENNIES,0,0,0,0));
+    public ClientReadFromServerThread(PennyClient pennyClient) {
+        this.pennyClient = pennyClient;
+        this.batches = new AtomicInteger();
+        this.timeElapsedTotal = null;
+        this.timeElapsedFirstBatch = null;
     }
 
     public int getBatches() {
-        return batches;
+        return batches.get();
     }
 
     public void setBatches(int batches) {
-        this.batches = batches;
+        this.batches.set(batches);
     }
 
-    public String getTimeElapsed() {
-        return timeElapsed;
+    public String getTimeElapsedTotal() {
+        return timeElapsedTotal;
+    }
+
+    public void setTimeElapsedTotal(String timeElapsedTotal) {
+        this.timeElapsedTotal = timeElapsedTotal;
+    }
+
+    public String getTimeElapsedFirstBatch() {
+        return timeElapsedFirstBatch;
+    }
+
+    public void setTimeElapsedFirstBatch(String timeElapsedFirstBatch) {
+        this.timeElapsedFirstBatch = timeElapsedFirstBatch;
     }
 
     @Override
     public void run() {
         while (true) {
-            if (socket.isClosed()) {
+            if (pennyClient.getSocket().isClosed()) {
                 return;
             }
+
             try {
-                String line = inputStream.readUTF();
-                System.out.println("input rcv from server: " + line);
-                long[] numbers = Arrays.stream(line.split(",")).mapToLong(Long::parseLong).toArray();
+                final String line = pennyClient.getInputStream().readUTF();
+                Logger.info(String.format("Input received from server (%s)", line));
+
+                final long[] numbers = Arrays.stream(line.split(",")).mapToLong(Long::parseLong).toArray();
+
+                /*
+                0 - New batch
+                1 - Scoreboard
+                2 - Total Time
+                3 - First Batch Time
+                 */
                 if (numbers[0] == 0) {
-                    System.out.printf("CRT has received new batch(s) %d%n", numbers[1]);
-                    batches += numbers[1];
+                    batches.addAndGet((int) numbers[1]);
                 } else if (numbers[0] == 1) {
-                    System.out.println("Update scoreboard");
                     int index = (int) numbers[1];
-                    internalScoreboard.set(index + 1, internalScoreboard.get(index + 1) + PennyServer.BATCH_SIZE);
-                    internalScoreboard.set(index, internalScoreboard.get(index) - PennyServer.BATCH_SIZE);
+                    internalScoreboard.set(index + 1, internalScoreboard.get(index + 1) + pennyClient.getBatchSize());
+                    internalScoreboard.set(index, internalScoreboard.get(index) - pennyClient.getBatchSize());
                 } else if (numbers[0] == 2) {
-                    timeElapsed = String.format("%,ds", numbers[1] / 1000);
+                    timeElapsedTotal = String.format("%,.2fs", numbers[1] / 1000.0);
+                } else if (numbers[0] == 3) {
+                    timeElapsedFirstBatch = String.format("%,.2fs", numbers[1] / 1000.0);
                 }
+
             } catch (Exception e) {
                 // TODO handle error?
             }
